@@ -5,7 +5,7 @@ Crane is a lightweight Java 21+ backend framework designed for building small an
 ## Modules
 
 ### `crane-core`
-Provides the basic application context, dependency injection, and lifecycle management.
+Provides the basic application context, dependency injection, lifecycle management and web server.
 
 ### `crane-data`
 Offers a simple abstraction over JDBC with predefined CRUD operations and basic entity annotations.
@@ -26,8 +26,8 @@ cd crane-framework
 
 Add the modules you need as dependencies to your project.
 
-Status
+Status:
 Crane is in active development and not yet production-ready. APIs may change. Soon an example project will be published here. Later on an initializer app will be published.
 
-License
+License:
 This project is licensed under the Apache 2.0 License.
