@@ -10,6 +10,9 @@ Provides the basic application context, dependency injection, lifecycle manageme
 ### `crane-data`
 Offers a simple abstraction over JDBC with predefined CRUD operations and basic entity annotations.
 
+### `crane-mail`
+Offers a easy way to configure and send emails. Build on top of jakarta mail.
+
 ## Goals
 
 - Lightweight and modular
