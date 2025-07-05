@@ -24,6 +24,10 @@ public class AppContext {
     }
   }
 
+  public <T> void registerInstance(Class<T> type, T instance) {
+    components.put(type, instance);
+  }
+
 
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> type) {

@@ -63,6 +63,10 @@ public class ConfigurationManager {
       defaultConfig.setDatabase(userConfig.getDatabase());
     }
 
+    if (userConfig.getMail() != null) {
+      defaultConfig.setMail(userConfig.getMail());
+    }
+
     return defaultConfig;
   }
 

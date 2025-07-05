@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.crane</groupId>
     <artifactId>crane-framework</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
   </parent>
 
   <artifactId>crane-data</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>com.crane</groupId>
       <artifactId>crane-core</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
     </dependency>
 
     <dependency>
