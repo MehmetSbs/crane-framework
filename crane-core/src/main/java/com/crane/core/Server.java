@@ -3,6 +3,10 @@ package com.crane.core;
 import com.crane.core.config.ConfigurationManager;
 import com.crane.core.config.CraneConfig;
 import com.crane.core.config.DatabaseConfig;
+import com.crane.core.middleware.ExceptionMiddleware;
+import com.crane.core.middleware.LogMiddleware;
+import com.crane.core.middleware.Middleware;
+import com.crane.core.middleware.TransactionalMiddleware;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -11,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.sql.DataSource;
 
 public class Server {
 
@@ -36,14 +42,16 @@ public class Server {
       dbConfig = craneConfig.getDatabase();
     }
 
-
+    use(new LogMiddleware());
+    use(new ExceptionMiddleware());
 
     LOGGER.info("Looking for database configuration");
 
-    // Check if data module is available and initialize if needed
     if (dbConfig != null && isDataModuleAvailable()) {
-      initializeDataSource();
+      DataSource dataSource = initializeDataSource();
       LOGGER.info("Database connection pool initialized");
+      use(new TransactionalMiddleware(dataSource));
+      LOGGER.info("TransactionalMiddleware has been enabled.");
     } else if (dbConfig != null && !isDataModuleAvailable()) {
       LOGGER.warn("DatabaseConfig provided but crane-data module not found in classpath");
     } else {
@@ -53,16 +61,18 @@ public class Server {
     HttpServer httpServer = HttpServer.create(new InetSocketAddress(craneConfig.getServer().getPort()), 0);
     LOGGER.info("Http Server Created");
 
-    use(new LogMiddleware());
-    use(new ExceptionMiddleware());
+
 
     httpServer.createContext("/", exchange -> {
-      var handler = router.route(exchange.getRequestMethod(), exchange.getRequestURI().getPath());
-      if (handler != null) {
+      var routeInfo = router.route(exchange.getRequestMethod(), exchange.getRequestURI().getPath());
+      if (routeInfo != null) {
         Thread.startVirtualThread(() -> {
           try {
             Context context = new Context(exchange);
-            Handler finalHandler = handler;
+            if (routeInfo.isTransactional()) {
+              context.markTransactional();
+            }
+            Handler finalHandler = routeInfo.getHandler();
 
             for (int i = middlewareList.size() - 1; i >= 0; i--) {
               Middleware middleware = middlewareList.get(i);
@@ -113,7 +123,7 @@ public class Server {
     }
   }
 
-  private void initializeDataSource() {
+  private DataSource initializeDataSource() {
     try {
       // Use reflection to call DataSourceProvider.init()
       Class<?> dataSourceProviderClass = Class.forName("com.crane.data.DataSourceProvider");
@@ -125,7 +135,7 @@ public class Server {
 
       // Call DataSourceProvider.init(jdbcUrl, username, password)
       var initMethod = dataSourceProviderClass.getMethod("init", String.class, String.class, String.class);
-      initMethod.invoke(null, jdbcUrl, username, password);
+      return (DataSource) initMethod.invoke(null, jdbcUrl, username, password);
 
     } catch (Exception e) {
       LOGGER.error("Failed to initialize data source", e);
@@ -137,7 +147,7 @@ public class Server {
     middlewareList.add(middleware);
   }
 
-  public <T> void registerService(Class<T> type, T instance) {
+  public <T> void registerComponent(Class<T> type, T instance) {
     appContext.register(type, instance);
   }
 

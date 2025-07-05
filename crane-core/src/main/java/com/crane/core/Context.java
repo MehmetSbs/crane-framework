@@ -15,6 +15,7 @@ public class Context {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
   private final HttpExchange exchange;
+  private boolean isTransactional = false;
 
   public Context(HttpExchange exchange) {
     this.exchange = exchange;
@@ -97,4 +98,13 @@ public class Context {
   public void statusResponse(int code) throws IOException {
     exchange.sendResponseHeaders(code, -1);
   }
+
+  protected void markTransactional(){
+    isTransactional = true;
+  }
+
+  public boolean isTransactional() {
+    return isTransactional;
+  }
+
 }

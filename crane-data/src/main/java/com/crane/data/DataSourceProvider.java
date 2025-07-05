@@ -3,6 +3,7 @@ package com.crane.data;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -10,7 +11,7 @@ public class DataSourceProvider {
 
   private static HikariDataSource dataSource;
 
-  public static void init(String jdbcUrl, String username, String password) {
+  public static DataSource init(String jdbcUrl, String username, String password) {
     HikariConfig config = new HikariConfig();
     config.setJdbcUrl(jdbcUrl);
     config.setUsername(username);
@@ -22,6 +23,7 @@ public class DataSourceProvider {
     config.setLeakDetectionThreshold(5000);
 
     dataSource = new HikariDataSource(config);
+    return dataSource;
   }
 
   public static Connection getConnection() throws SQLException {

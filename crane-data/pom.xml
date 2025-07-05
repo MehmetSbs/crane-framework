@@ -7,13 +7,19 @@
   <parent>
     <groupId>com.crane</groupId>
     <artifactId>crane-framework</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </parent>
 
   <artifactId>crane-data</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>
+
+    <dependency>
+      <groupId>com.crane</groupId>
+      <artifactId>crane-core</artifactId>
+      <version>1.0.1</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
