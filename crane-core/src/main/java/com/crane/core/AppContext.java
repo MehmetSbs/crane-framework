@@ -1,19 +1,33 @@
 package com.crane.core;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AppContext {
 
-  private final Map<Class<?>, Object> services = new HashMap<>();
+  private final Map<Class<?>, Object> components = new HashMap<>();
 
-  public <T> void register(Class<T> type, T instance) {
-    services.put(type, instance);
+  protected  <T> void register(Class<T> type) {
+    if (components.containsKey(type)) {
+      return; // Already registered
+    }
+
+    try {
+      Constructor<T> constructor = type.getConstructor(AppContext.class);
+      T instance = constructor.newInstance(this); // this = AppContext
+      components.put(type, instance);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException("Component " + type.getName() + " must have a constructor with AppContext");
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to instantiate component " + type.getName(), e);
+    }
   }
+
 
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> type) {
-    T t = (T) services.get(type);
+    T t = (T) components.get(type);
     if (t == null) {
       throw new RuntimeException("No service registered for type " + type);
     }
@@ -21,6 +35,6 @@ public class AppContext {
   }
 
   public boolean contains(Class<?> type) {
-    return services.containsKey(type);
+    return components.containsKey(type);
   }
 }

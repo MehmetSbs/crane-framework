@@ -147,8 +147,8 @@ public class Server {
     middlewareList.add(middleware);
   }
 
-  public <T> void registerComponent(Class<T> type, T instance) {
-    appContext.register(type, instance);
+  public <T> void registerComponent(Class<T> type) {
+    appContext.register(type);
   }
 
   public void registerController(Controller controller) {
